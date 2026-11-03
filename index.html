@@ -1,0 +1,385 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Finanzplaner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: eine Spalte, Tabs unten, Zahlen zuerst. */
+:root{--bg:#f3f5f1;--surface:#ffffff;--ink:#17201c;--muted:#66726b;--line:#dde3da;--accent:#1d6b57;--accent-ink:#ffffff;--pos:#1d6b57;--neg:#b1412e;--radius:14px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0f1513;--surface:#17201d;--ink:#e6eee9;--muted:#8fa096;--line:#2a3631;--accent:#5cc2a2;--accent-ink:#0d1512;--pos:#5cc2a2;--neg:#f08a74;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1513;--surface:#17201d;--ink:#e6eee9;--muted:#8fa096;--line:#2a3631;--accent:#5cc2a2;--accent-ink:#0d1512;--pos:#5cc2a2;--neg:#f08a74;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 Manrope,system-ui,-apple-system,sans-serif;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:96px;overflow-x:hidden}
+header.top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:14px 0 10px}
+h1{font-size:22px;margin:0;letter-spacing:-0.02em}
+h2{font-size:15px;margin:0 0 10px}
+.muted{color:var(--muted)}
+.neg{color:var(--neg)}
+.pos{color:var(--pos)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.card.hero{border-color:var(--accent)}
+label{display:block;margin-bottom:10px}
+.lbl{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+input,select{width:100%;min-width:0;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.addrow{display:grid;grid-template-columns:1fr 110px auto;gap:8px;margin-bottom:6px}
+.btn{font:inherit;font-weight:700;background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:11px 14px;cursor:pointer}
+.btn.full{width:100%}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--line)}
+.list li>span:first-child{min-width:0;overflow-wrap:anywhere}
+.right{display:flex;align-items:center;gap:6px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.x{background:none;border:0;color:var(--muted);font-size:20px;line-height:1;padding:2px 6px;cursor:pointer}
+.sum{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px;margin-top:4px;font-weight:700;font-variant-numeric:tabular-nums}
+.big{font-size:32px;font-weight:800;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;margin:2px 0 4px}
+.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+td{padding:9px 0;border-top:1px solid var(--line)}
+td:last-child{text-align:right;font-weight:700;white-space:nowrap}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px;min-width:0;font-size:12px;color:var(--muted)}
+.kpi b{display:block;font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:4px;overflow-wrap:anywhere}
+.chart{width:100%;height:auto;display:block}
+.axis{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
+.hbar{display:grid;grid-template-columns:96px 1fr auto;gap:8px;align-items:center;margin:9px 0;font-size:13px;font-variant-numeric:tabular-nums}
+.hbar span{overflow-wrap:anywhere}
+.track{background:var(--line);border-radius:6px;height:10px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--accent);border-radius:6px}
+.cols{display:flex;gap:8px;height:140px;margin-top:6px}
+.col{flex:1;min-width:0;display:flex;flex-direction:column;height:100%}
+.bar{flex:1;display:flex;align-items:flex-end}
+.bar i{display:block;width:100%;background:var(--accent);border-radius:6px 6px 2px 2px;min-height:2px}
+.col span{font-size:11px;color:var(--muted);text-align:center;margin-top:4px}
+.tabbar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:4px;background:var(--surface);border-top:1px solid var(--line);padding:6px max(10px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-right,0px))}
+.tabbar button{flex:1;font:inherit;font-size:12px;font-weight:700;background:none;border:0;color:var(--muted);padding:9px 0;border-radius:10px;cursor:pointer}
+.tabbar button.on{color:var(--accent);background:var(--bg)}
+.calc{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700;font-variant-numeric:tabular-nums}
+</style>
+
+<header class="top">
+  <h1>Finanzplaner</h1>
+  <span id="monat" class="muted" style="font-size:12px"></span>
+</header>
+<main id="app"></main>
+<nav class="tabbar" id="tabs">
+  <button data-tab="plan" class="on">Plan</button>
+  <button data-tab="ausgaben">Ausgaben</button>
+  <button data-tab="fahrten">Fahrten</button>
+  <button data-tab="analyse">Analyse</button>
+</nav>
+
+<script>
+const KEY = 'finanzplaner-v1';
+const KAT = ['Lebensmittel','Wohnen','Mobilität','Freizeit','Kleidung','Gesundheit','Sonstiges'];
+
+function defaults(){
+  return {gehalt:3000, fixkosten:[], budget:0, km:0, verbrauch:6.5, spritpreis:1.85,
+          startkapital:0, zins:0, zielName:'Ziel', ziel:0, ausgaben:[], fahrten:[]};
+}
+let state = defaults();
+try{ const raw = localStorage.getItem(KEY); if(raw) state = Object.assign(defaults(), JSON.parse(raw)); }catch(e){}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+const $ = s => document.querySelector(s);
+const eur = n => (Number(n)||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
+const num = v => { const x = parseFloat(String(v).replace(',','.')); return isFinite(x) ? x : 0; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2,9);
+const sumBy = (arr, fn) => arr.reduce((a,x) => a + fn(x), 0);
+function today(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+const monthKey = d => d.slice(0,7);
+const fmtDate = d => { const [y,m,dd] = d.split('-'); return dd+'.'+m+'.'+y; };
+function monthKeyOffset(i){
+  const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()-i);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function monthLabel(k){
+  const [y,m] = k.split('-');
+  return new Date(+y, +m-1, 1).toLocaleDateString('de-DE',{month:'short'});
+}
+
+/* ---------- Berechnungen ---------- */
+const fixSum = () => sumBy(state.fixkosten, f => f.betrag);
+const sprit = () => state.km * state.verbrauch / 100 * state.spritpreis;
+const frei = () => state.gehalt - fixSum() - sprit() - state.budget;
+const quote = () => state.gehalt > 0 ? frei() / state.gehalt * 100 : 0;
+const fahrtKosten = f => f.km * state.verbrauch / 100 * state.spritpreis;
+
+function series(n){
+  const r = state.zins / 1200, s = frei();
+  let k = state.startkapital;
+  const out = [k];
+  for(let i = 0; i < n; i++){ k = k * (1 + r) + s; out.push(k); }
+  return out;
+}
+function zielMonate(){
+  const S = series(1200);
+  const i = S.findIndex(v => v >= state.ziel);
+  return i < 0 ? null : i;
+}
+function monatTxt(n){
+  if(n === 0) return 'sofort';
+  const j = Math.floor(n/12), m = n % 12;
+  return [j ? j+' Jahr'+(j>1?'e':'') : '', m ? m+' Monat'+(m>1?'e':'') : ''].filter(Boolean).join(' ');
+}
+function dateStr(n){
+  const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()+n);
+  return d.toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+}
+
+/* ---------- Ansichten ---------- */
+function item(name, amount, list, id){
+  return `<li><span>${esc(name)}</span><span class="right">${amount}<button class="x" data-del="${list}" data-id="${id}" aria-label="Löschen">×</button></span></li>`;
+}
+
+function viewPlan(){
+  const S = series(60);
+  const f = frei();
+  const zi = zielMonate();
+  let zielHtml;
+  if(state.ziel <= 0) zielHtml = '<p class="hint">Trag einen Ziel-Betrag ein, dann siehst du, wann du ihn erreichst.</p>';
+  else if(zi === null) zielHtml = '<p class="neg" style="margin:8px 0 0">Mit dieser Sparrate erreichst du das Ziel nicht.</p>';
+  else zielHtml = `<p style="margin:8px 0 0">„${esc(state.zielName)}“ erreicht in <b>${monatTxt(zi)}</b> (${dateStr(zi)}).</p>`;
+
+  const rows = [3,6,12,24,36,60].map(m =>
+    `<tr><td>in ${m} Monaten<span class="muted"> · ${dateStr(m)}</span></td><td>${eur(S[m])}</td></tr>`).join('');
+
+  return `
+  <section class="card">
+    <label><span class="lbl">Nettogehalt pro Monat (€)</span>
+      <input type="number" inputmode="decimal" step="10" data-f="gehalt" value="${state.gehalt}"></label>
+  </section>
+
+  <section class="card">
+    <h2>Fixkosten</h2>
+    <form data-form="fix" class="addrow">
+      <input name="name" type="text" placeholder="z. B. Miete" required>
+      <input name="betrag" type="number" inputmode="decimal" step="0.01" placeholder="€" required>
+      <button class="btn">+</button>
+    </form>
+    <ul class="list">${state.fixkosten.map(x => item(x.name, eur(x.betrag), 'fixkosten', x.id)).join('') || '<li class="muted">Noch keine Fixkosten.</li>'}</ul>
+    <div class="sum"><span>Summe Fixkosten</span><span>${eur(fixSum())}</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Monatlich</h2>
+    <label><span class="lbl">Sonstige Ausgaben als Budget (€)</span>
+      <input type="number" inputmode="decimal" step="10" data-f="budget" value="${state.budget}"></label>
+    <label><span class="lbl">Gefahrene km pro Monat</span>
+      <input type="number" inputmode="decimal" step="10" data-f="km" value="${state.km}"></label>
+    <div class="calc"><span class="muted" style="font-weight:400">Sprit pro Monat</span><span>${eur(sprit())}</span></div>
+    <p class="hint">Basis: ${state.verbrauch.toLocaleString('de-DE')} l/100 km, ${state.spritpreis.toLocaleString('de-DE')} €/l (änderbar im Tab Fahrten).</p>
+  </section>
+
+  <section class="card hero">
+    <span class="lbl">Frei zum Sparen pro Monat</span>
+    <div class="big ${f < 0 ? 'neg' : 'pos'}">${eur(f)}</div>
+    <p class="hint" style="margin:0">Sparquote: ${quote().toLocaleString('de-DE',{maximumFractionDigits:1})} % vom Gehalt</p>
+  </section>
+
+  <section class="card">
+    <h2>Sparziel und Prognose</h2>
+    <div class="row2">
+      <label><span class="lbl">Vorhandenes Geld (€)</span>
+        <input type="number" inputmode="decimal" step="10" data-f="startkapital" value="${state.startkapital}"></label>
+      <label><span class="lbl">Zins pro Jahr (%)</span>
+        <input type="number" inputmode="decimal" step="0.1" data-f="zins" value="${state.zins}"></label>
+      <label><span class="lbl">Name des Ziels</span>
+        <input type="text" data-f="zielName" data-type="text" value="${esc(state.zielName)}"></label>
+      <label><span class="lbl">Ziel-Betrag (€)</span>
+        <input type="number" inputmode="decimal" step="100" data-f="ziel" value="${state.ziel}"></label>
+    </div>
+    ${zielHtml}
+    <table style="margin-top:12px">${rows}</table>
+  </section>`;
+}
+
+function viewAusgaben(){
+  const mk = monthKey(today());
+  const used = sumBy(state.ausgaben.filter(a => monthKey(a.datum) === mk), a => a.betrag);
+  const left = state.budget - used;
+  const sorted = [...state.ausgaben].sort((a,b) => b.datum.localeCompare(a.datum));
+  return `
+  <div class="kpis">
+    <div class="kpi">Diesen Monat ausgegeben<b>${eur(used)}</b></div>
+    <div class="kpi">Budget übrig<b class="${left < 0 ? 'neg' : 'pos'}">${eur(left)}</b></div>
+  </div>
+
+  <section class="card">
+    <h2>Ausgabe erfassen</h2>
+    <form data-form="ausgabe">
+      <div class="row2">
+        <label><span class="lbl">Datum</span><input type="date" name="datum" value="${today()}"></label>
+        <label><span class="lbl">Betrag (€)</span><input type="number" name="betrag" inputmode="decimal" step="0.01" required></label>
+      </div>
+      <label><span class="lbl">Kategorie</span>
+        <select name="kategorie">${KAT.map(k => `<option>${k}</option>`).join('')}</select></label>
+      <label><span class="lbl">Notiz</span><input type="text" name="notiz" placeholder="optional"></label>
+      <button class="btn full">Hinzufügen</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Verlauf</h2>
+    <ul class="list">${sorted.map(a => `<li><span>${fmtDate(a.datum)} · ${esc(a.kategorie)}${a.notiz ? '<br><span class="muted">'+esc(a.notiz)+'</span>' : ''}</span><span class="right">${eur(a.betrag)}<button class="x" data-del="ausgaben" data-id="${a.id}" aria-label="Löschen">×</button></span></li>`).join('') || '<li class="muted">Noch keine Ausgaben erfasst.</li>'}</ul>
+  </section>`;
+}
+
+function viewFahrten(){
+  const sorted = [...state.fahrten].sort((a,b) => b.datum.localeCompare(a.datum));
+  const totalKm = sumBy(state.fahrten, f => f.km);
+  const totalCost = sumBy(state.fahrten, fahrtKosten);
+  const monate = new Set(state.fahrten.map(f => monthKey(f.datum))).size;
+  const avg = monate ? totalKm / monate : 0;
+  return `
+  <section class="card">
+    <h2>Spritkosten</h2>
+    <div class="row2">
+      <label><span class="lbl">Verbrauch (l/100 km)</span>
+        <input type="number" inputmode="decimal" step="0.1" data-f="verbrauch" value="${state.verbrauch}"></label>
+      <label><span class="lbl">Spritpreis (€/l)</span>
+        <input type="number" inputmode="decimal" step="0.01" data-f="spritpreis" value="${state.spritpreis}"></label>
+    </div>
+    <label><span class="lbl">Strecke rechnen (km)</span>
+      <input type="number" inputmode="decimal" step="0.1" id="rechKm" placeholder="z. B. 42"></label>
+    <div class="calc"><span class="muted" style="font-weight:400">Kosten</span><span id="rechOut">${eur(0)}</span></div>
+  </section>
+
+  <div class="kpis">
+    <div class="kpi">Kilometer gesamt<b>${totalKm.toLocaleString('de-DE',{maximumFractionDigits:1})} km</b></div>
+    <div class="kpi">Sprit gesamt<b>${eur(totalCost)}</b></div>
+  </div>
+
+  <section class="card">
+    <h2>Fahrt eintragen</h2>
+    <form data-form="fahrt">
+      <div class="row2">
+        <label><span class="lbl">Datum</span><input type="date" name="datum" value="${today()}"></label>
+        <label><span class="lbl">Kilometer</span><input type="number" name="km" inputmode="decimal" step="0.1" required></label>
+      </div>
+      <label><span class="lbl">Zweck</span><input type="text" name="zweck" placeholder="z. B. Arbeit"></label>
+      <button class="btn full">Speichern</button>
+    </form>
+    <p class="hint">Durchschnitt: ${avg.toLocaleString('de-DE',{maximumFractionDigits:0})} km pro Monat aus deinem Fahrtenbuch.</p>
+  </section>
+
+  <section class="card">
+    <h2>Fahrtenbuch</h2>
+    <ul class="list">${sorted.map(f => `<li><span>${fmtDate(f.datum)} · ${esc(f.zweck || 'Fahrt')}<br><span class="muted">${f.km.toLocaleString('de-DE',{maximumFractionDigits:1})} km · ${eur(fahrtKosten(f))}</span></span><button class="x" data-del="fahrten" data-id="${f.id}" aria-label="Löschen">×</button></li>`).join('') || '<li class="muted">Noch keine Fahrten.</li>'}</ul>
+  </section>`;
+}
+
+function viewAnalyse(){
+  const mk = monthKey(today());
+  const ausMonth = sumBy(state.ausgaben.filter(a => monthKey(a.datum) === mk), a => a.betrag);
+  const ausAll = sumBy(state.ausgaben, a => a.betrag);
+  const trips = sumBy(state.fahrten, fahrtKosten);
+
+  const S = series(36);
+  const min = Math.min(...S), max = Math.max(...S), span = (max - min) || 1;
+  const W = 320, H = 150, P = 6;
+  const pts = S.map((v,i) => {
+    const x = P + i / (S.length - 1) * (W - 2*P);
+    const y = H - P - (v - min) / span * (H - 2*P);
+    return x.toFixed(1)+','+y.toFixed(1);
+  }).join(' ');
+  const chart = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Kontoverlauf über 36 Monate">
+    <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  </svg>
+  <div class="axis"><span>heute ${eur(S[0])}</span><span>+36 Monate ${eur(S[S.length-1])}</span></div>`;
+
+  const cats = KAT.map(k => [k, sumBy(state.ausgaben.filter(a => a.kategorie === k), a => a.betrag)]);
+  const cmax = Math.max(1, ...cats.map(c => c[1]));
+  const catHtml = cats.map(([k,v]) =>
+    `<div class="hbar"><span>${k}</span><div class="track"><i style="width:${(v/cmax*100).toFixed(1)}%"></i></div><b>${eur(v)}</b></div>`).join('');
+
+  const keys = [5,4,3,2,1,0].map(monthKeyOffset);
+  const vals = keys.map(k => sumBy(state.ausgaben.filter(a => monthKey(a.datum) === k), a => a.betrag)
+                         + sumBy(state.fahrten.filter(f => monthKey(f.datum) === k), fahrtKosten));
+  const vmax = Math.max(1, ...vals);
+  const monHtml = keys.map((k,i) =>
+    `<div class="col"><div class="bar"><i style="height:${(vals[i]/vmax*100).toFixed(1)}%"></i></div><span>${monthLabel(k)}</span></div>`).join('');
+
+  const sparquote = quote().toLocaleString('de-DE',{maximumFractionDigits:1}) + ' %';
+  return `
+  <div class="kpis">
+    <div class="kpi">Sparen pro Monat<b class="${frei() < 0 ? 'neg' : 'pos'}">${eur(frei())}</b></div>
+    <div class="kpi">Sparquote<b>${sparquote}</b></div>
+    <div class="kpi">Ausgaben diesen Monat<b>${eur(ausMonth)}</b></div>
+    <div class="kpi">Ausgaben gesamt<b>${eur(ausAll + trips)}</b></div>
+  </div>
+
+  <section class="card">
+    <h2>Kontoverlauf</h2>
+    ${chart}
+    <p class="hint">Mit Zinsen von ${state.zins.toLocaleString('de-DE')} % pro Jahr und einer Sparrate von ${eur(frei())} pro Monat.</p>
+  </section>
+
+  <section class="card">
+    <h2>Ausgaben nach Kategorie</h2>
+    ${catHtml}
+  </section>
+
+  <section class="card">
+    <h2>Letzte 6 Monate (inkl. Sprit)</h2>
+    <div class="cols">${monHtml}</div>
+  </section>`;
+}
+
+/* ---------- Steuerung ---------- */
+let tab = 'plan';
+const VIEWS = {plan: viewPlan, ausgaben: viewAusgaben, fahrten: viewFahrten, analyse: viewAnalyse};
+
+function render(){
+  $('#app').innerHTML = VIEWS[tab]();
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  $('#monat').textContent = new Date().toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+}
+function commit(){ save(); render(); }
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-tab]');
+  if(t){ tab = t.dataset.tab; render(); window.scrollTo(0,0); return; }
+  const d = e.target.closest('[data-del]');
+  if(d){
+    const list = d.dataset.del;
+    state[list] = state[list].filter(x => x.id !== d.dataset.id);
+    commit();
+  }
+});
+
+document.addEventListener('change', e => {
+  const t = e.target;
+  if(!t.dataset || !t.dataset.f) return;
+  state[t.dataset.f] = t.dataset.type === 'text' ? t.value : num(t.value);
+  commit();
+});
+
+document.addEventListener('input', e => {
+  if(e.target.id === 'rechKm'){
+    const o = $('#rechOut');
+    if(o) o.textContent = eur(num(e.target.value) * state.verbrauch / 100 * state.spritpreis);
+  }
+});
+
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  const f = e.target, d = new FormData(f), k = f.dataset.form;
+  if(k === 'fix'){
+    state.fixkosten.push({id:uid(), name:String(d.get('name')).trim() || 'Fixkosten', betrag:num(d.get('betrag'))});
+  }
+  if(k === 'ausgabe'){
+    state.ausgaben.push({id:uid(), datum:d.get('datum') || today(), kategorie:String(d.get('kategorie')),
+                         betrag:num(d.get('betrag')), notiz:String(d.get('notiz') || '').trim()});
+  }
+  if(k === 'fahrt'){
+    state.fahrten.push({id:uid(), datum:d.get('datum') || today(), km:num(d.get('km')),
+                        zweck:String(d.get('zweck') || '').trim()});
+  }
+  commit();
+});
+
+render();
+</script>
