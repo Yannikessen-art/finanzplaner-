@@ -1,347 +1,492 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <title>Finanzplaner</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap">
 <style>
-/* Layout: eine Spalte, Tabs unten, Zahlen zuerst. */
-:root{--bg:#f3f5f1;--surface:#ffffff;--ink:#17201c;--muted:#66726b;--line:#dde3da;--accent:#1d6b57;--accent-ink:#ffffff;--pos:#1d6b57;--neg:#b1412e;--radius:14px}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0f1513;--surface:#17201d;--ink:#e6eee9;--muted:#8fa096;--line:#2a3631;--accent:#5cc2a2;--accent-ink:#0d1512;--pos:#5cc2a2;--neg:#f08a74;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0f1513;--surface:#17201d;--ink:#e6eee9;--muted:#8fa096;--line:#2a3631;--accent:#5cc2a2;--accent-ink:#0d1512;--pos:#5cc2a2;--neg:#f08a74;color-scheme:dark}
+:root{--bg:#f1f3f7;--card:#ffffff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--accent:#2563eb;--chip:#e8efff;--pos:#15803d;--neg:#dc2626;--posbg:#dcfce7;--negbg:#fee2e2}
+@media (prefers-color-scheme: dark){:root{--bg:#070b13;--card:#111827;--ink:#f1f5f9;--muted:#94a3b8;--line:#1f2a3d;--accent:#3b82f6;--chip:#1e293b;--pos:#4ade80;--neg:#f87171;--posbg:#14532d;--negbg:#7f1d1d;color-scheme:dark}}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font:14px/1.45 Manrope,system-ui,-apple-system,sans-serif;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:96px;overflow-x:hidden}
-header.top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:14px 0 10px}
-h1{font-size:22px;margin:0;letter-spacing:-0.02em}
-h2{font-size:15px;margin:0 0 10px}
-.muted{color:var(--muted)}
-.neg{color:var(--neg)}
+body{background:var(--bg);color:var(--ink);font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:112px;overflow-x:hidden}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 0 8px}
+.brand{font-size:22px;font-weight:800;letter-spacing:-0.02em;margin:0}
+.chip{font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;background:var(--chip);color:var(--accent);white-space:nowrap}
+.monthnav{display:flex;align-items:center;gap:10px;margin:4px 0 14px}
+.monthnav button{width:36px;height:36px;border-radius:50%;border:0;background:var(--card);color:var(--ink);font-size:20px;box-shadow:0 1px 2px rgba(15,23,42,.08);cursor:pointer}
+.monthnav span{flex:1;text-align:center;font-weight:700;font-size:16px}
+.sec{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:20px 4px 8px}
+.card{background:var(--card);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.card h2{font-size:15px;margin:0 0 12px;font-weight:700}
+.lbl{color:var(--muted);font-size:13px}
+.big{font-size:34px;font-weight:800;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;margin:4px 0 6px}
+.delta{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;margin-bottom:12px}
+.delta.pos{background:var(--posbg);color:var(--pos)}
+.delta.neg{background:var(--negbg);color:var(--neg)}
+.split{display:flex;justify-content:space-between;gap:10px;font-size:14px;color:var(--muted);padding:10px 0;border-top:1px solid var(--line)}
+.split b{color:var(--ink);font-variant-numeric:tabular-nums}
 .pos{color:var(--pos)}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
-.card.hero{border-color:var(--accent)}
-label{display:block;margin-bottom:10px}
-.lbl{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
-input,select{width:100%;min-width:0;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.addrow{display:grid;grid-template-columns:1fr 110px auto;gap:8px;margin-bottom:6px}
-.btn{font:inherit;font-weight:700;background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:11px 14px;cursor:pointer}
-.btn.full{width:100%}
-.list{list-style:none;margin:0;padding:0}
-.list li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--line)}
-.list li>span:first-child{min-width:0;overflow-wrap:anywhere}
-.right{display:flex;align-items:center;gap:6px;white-space:nowrap;font-variant-numeric:tabular-nums}
-.x{background:none;border:0;color:var(--muted);font-size:20px;line-height:1;padding:2px 6px;cursor:pointer}
-.sum{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px;margin-top:4px;font-weight:700;font-variant-numeric:tabular-nums}
-.big{font-size:32px;font-weight:800;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;margin:2px 0 4px}
-.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-td{padding:9px 0;border-top:1px solid var(--line)}
-td:last-child{text-align:right;font-weight:700;white-space:nowrap}
+.neg{color:var(--neg)}
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px;min-width:0;font-size:12px;color:var(--muted)}
-.kpi b{display:block;font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:4px;overflow-wrap:anywhere}
+.kpi{background:var(--card);border-radius:18px;padding:14px;box-shadow:0 1px 2px rgba(15,23,42,.05);min-width:0}
+.kpi small{display:block;color:var(--muted);font-size:12px}
+.kpi b{display:block;font-size:19px;font-variant-numeric:tabular-nums;margin-top:4px;overflow-wrap:anywhere}
+.kpi em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:4px}
+.donutwrap{display:flex;align-items:center;gap:16px}
+.donut{width:130px;height:130px;flex:none}
+.donut .dv{font-size:12px;font-weight:700;fill:var(--ink)}
+.donut .dl{font-size:9px;fill:var(--muted)}
+.legend{display:grid;gap:9px;flex:1;min-width:0}
+.leg{display:grid;grid-template-columns:10px 1fr auto;gap:8px;align-items:center;font-size:13px}
+.leg b{font-variant-numeric:tabular-nums}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.row{display:flex;align-items:center;gap:12px;padding:12px 0}
+.row+.row{border-top:1px solid var(--line)}
+.row .meta{flex:1;min-width:0}
+.row .meta b{display:block;font-weight:600;overflow-wrap:anywhere}
+.row .meta small{color:var(--muted);font-size:12.5px;overflow-wrap:anywhere}
+.row .amt{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.row .amt.soft{color:var(--muted);font-weight:600}
+.del{background:none;border:0;color:var(--muted);font-size:20px;padding:0 2px;cursor:pointer}
+.day{font-size:13px;color:var(--muted);margin:16px 0 2px;font-weight:600}
+.hbar{display:grid;grid-template-columns:10px 1fr auto;gap:10px;align-items:center;margin:12px 0;font-size:14px}
+.hbar em{font-style:normal;font-variant-numeric:tabular-nums;font-weight:600}
+.track{height:8px;border-radius:8px;background:var(--line);overflow:hidden}
+.track i{display:block;height:100%;border-radius:8px}
+.hint{font-size:13px;color:var(--muted);margin:8px 0 0}
+label{display:block;margin-bottom:12px;font-size:13px;color:var(--muted)}
+input,select{display:block;width:100%;margin-top:6px;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:0;border-radius:12px;padding:12px;min-width:0;-webkit-appearance:none;appearance:none}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--bg);border-radius:12px;padding:3px;margin-bottom:14px}
+.seg label{margin:0;position:relative}
+.seg input{position:absolute;opacity:0;pointer-events:none;margin:0}
+.seg span{display:block;text-align:center;padding:9px 4px;border-radius:10px;color:var(--muted);font-weight:600;font-size:14px}
+.seg input:checked+span{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(15,23,42,.12)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{width:100%;border:0;border-radius:14px;background:var(--accent);color:#fff;font:inherit;font-weight:700;padding:14px;font-size:16px;cursor:pointer}
+.addrow{display:grid;grid-template-columns:1fr 110px auto;gap:8px;margin-bottom:8px}
+.addrow .btn{width:auto;padding:12px 16px}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
+.list li>span:first-child{min-width:0;overflow-wrap:anywhere}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--bg);border-radius:14px;padding:12px;min-width:0}
+.stat small{display:block;color:var(--muted);font-size:12px}
+.stat b{font-size:17px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.cols{display:flex;gap:10px;height:130px}
+.cols>div{flex:1;min-width:0;height:100%;display:flex;flex-direction:column}
+.cols .bar{flex:1;display:flex;align-items:flex-end}
+.cols .bar b{display:block;width:100%;background:var(--accent);border-radius:8px 8px 3px 3px;min-height:3px}
+.cols span{font-size:11px;color:var(--muted);text-align:center;margin-top:6px}
 .chart{width:100%;height:auto;display:block}
 .axis{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
-.hbar{display:grid;grid-template-columns:96px 1fr auto;gap:8px;align-items:center;margin:9px 0;font-size:13px;font-variant-numeric:tabular-nums}
-.hbar span{overflow-wrap:anywhere}
-.track{background:var(--line);border-radius:6px;height:10px;overflow:hidden}
-.track i{display:block;height:100%;background:var(--accent);border-radius:6px}
-.cols{display:flex;gap:8px;height:140px;margin-top:6px}
-.col{flex:1;min-width:0;display:flex;flex-direction:column;height:100%}
-.bar{flex:1;display:flex;align-items:flex-end}
-.bar i{display:block;width:100%;background:var(--accent);border-radius:6px 6px 2px 2px;min-height:2px}
-.col span{font-size:11px;color:var(--muted);text-align:center;margin-top:4px}
-.tabbar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:4px;background:var(--surface);border-top:1px solid var(--line);padding:6px max(10px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-right,0px))}
-.tabbar button{flex:1;font:inherit;font-size:12px;font-weight:700;background:none;border:0;color:var(--muted);padding:9px 0;border-radius:10px;cursor:pointer}
-.tabbar button.on{color:var(--accent);background:var(--bg)}
-.calc{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+td{padding:10px 0;border-top:1px solid var(--line)}
+td:last-child{text-align:right;font-weight:700;white-space:nowrap}
+.pills{display:flex;gap:8px;margin-bottom:12px}
+.pill{flex:1;border:0;border-radius:999px;background:var(--card);color:var(--muted);font:inherit;font-weight:600;font-size:13px;padding:9px;cursor:pointer;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.pill.on{background:var(--accent);color:#fff}
+.tabbar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:2px;background:var(--card);border-top:1px solid var(--line);padding:8px max(8px,env(safe-area-inset-left,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-right,0px));z-index:1000}
+.tabbar button{flex:1;border:0;background:none;color:var(--muted);font:inherit;font-size:11.5px;font-weight:600;padding:8px 0;border-radius:12px;cursor:pointer}
+.tabbar button.on{color:var(--accent);background:var(--chip)}
 </style>
 
 <header class="top">
-  <h1>Finanzplaner</h1>
-  <span id="monat" class="muted" style="font-size:12px"></span>
+  <h1 class="brand">Finanzplaner</h1>
+  <span class="chip" id="antriebChip">Benzin</span>
 </header>
 <main id="app"></main>
 <nav class="tabbar" id="tabs">
-  <button data-tab="plan" class="on">Plan</button>
-  <button data-tab="ausgaben">Ausgaben</button>
+  <button data-tab="uebersicht" class="on">Übersicht</button>
+  <button data-tab="buchungen">Buchungen</button>
+  <button data-tab="fahrzeug">Fahrzeug</button>
   <button data-tab="fahrten">Fahrten</button>
-  <button data-tab="analyse">Analyse</button>
+  <button data-tab="plan">Plan</button>
 </nav>
 
 <script>
-const KEY = 'finanzplaner-v1';
-const KAT = ['Lebensmittel','Wohnen','Mobilität','Freizeit','Kleidung','Gesundheit','Sonstiges'];
+const KEY3 = 'finanzplaner-v3', KEY2 = 'finanzplaner-v2', KEY1 = 'finanzplaner-v1';
+const KATS = {Tanken:'#2563eb', Laden:'#0891b2', Fahrt:'#0ea5e9', Fixkosten:'#64748b', Lebensmittel:'#16a34a', Wohnen:'#7c3aed', Mobilität:'#d97706', Freizeit:'#db2777', Kleidung:'#0d9488', Gesundheit:'#dc2626', Sonstiges:'#94a3b8'};
+const EDIT_KATS = ['Lebensmittel','Wohnen','Mobilität','Freizeit','Kleidung','Gesundheit','Sonstiges'];
+const ANTRIEB = {benzin:'Benzin', diesel:'Diesel', elektro:'Elektro', hybrid:'Hybrid'};
+const TYP_LABEL = {ausgabe:'Ausgabe', tanken:'Tanken', laden:'Laden', fahrt:'Fahrt'};
+const canTank = () => ['benzin','diesel','hybrid'].includes(state.antrieb);
+const canLade = () => ['elektro','hybrid'].includes(state.antrieb);
+const availTypes = () => ['ausgabe', ...(canTank() ? ['tanken'] : []), ...(canLade() ? ['laden'] : [])];
+const energyTypes = () => [...(canTank() ? ['tanken'] : []), ...(canLade() ? ['laden'] : [])];
 
-function defaults(){
-  return {gehalt:3000, fixkosten:[], budget:0, km:0, verbrauch:6.5, spritpreis:1.85,
-          startkapital:0, zins:0, zielName:'Ziel', ziel:0, ausgaben:[], fahrten:[]};
-}
+/* ---------- Daten ---------- */
+const defaults = () => ({gehalt:3000, antrieb:'benzin', strompreis:0.35, fixkosten:[], budget:0, startkapital:0, zins:0, zielName:'Ziel', ziel:0, buchungen:[]});
 let state = defaults();
-try{ const raw = localStorage.getItem(KEY); if(raw) state = Object.assign(defaults(), JSON.parse(raw)); }catch(e){}
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+function migrate1(o){
+  const v = o.verbrauch ?? 6.5, p = o.spritpreis ?? 1.85;
+  return Object.assign(defaults(), {
+    gehalt:o.gehalt ?? 3000, fixkosten:o.fixkosten ?? [], budget:o.budget ?? 0,
+    startkapital:o.startkapital ?? 0, zins:o.zins ?? 0, zielName:o.zielName ?? 'Ziel', ziel:o.ziel ?? 0,
+    buchungen:[
+      ...(o.ausgaben ?? []).map(a => ({id:a.id, typ:'ausgabe', datum:a.datum, betrag:a.betrag, kategorie:a.kategorie, notiz:a.notiz ?? ''})),
+      ...(o.fahrten ?? []).map(f => { const l = f.km*v/100; return {id:f.id, typ:'tanken', datum:f.datum, betrag:l*p, km:f.km, liter:l, kategorie:'Tanken', notiz:(f.zweck ? f.zweck+' · ' : '')+'geschätzt aus altem Fahrtenbuch'}; })
+    ]
+  });
+}
+function load(){
+  for(const key of [KEY3, KEY2, KEY1]){
+    const raw = localStorage.getItem(key);
+    if(!raw) continue;
+    try{
+      const o = JSON.parse(raw);
+      state = key === KEY1 ? migrate1(o) : Object.assign(defaults(), o);
+    }catch(e){}
+    return;
+  }
+}
+function save(){ try{ localStorage.setItem(KEY3, JSON.stringify(state)); }catch(e){} }
 
+/* ---------- Helfer ---------- */
 const $ = s => document.querySelector(s);
 const eur = n => (Number(n)||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
+const fmt = (n, d=1) => (Number(n)||0).toLocaleString('de-DE',{maximumFractionDigits:d});
 const num = v => { const x = parseFloat(String(v).replace(',','.')); return isFinite(x) ? x : 0; };
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid = () => Math.random().toString(36).slice(2,9);
 const sumBy = (arr, fn) => arr.reduce((a,x) => a + fn(x), 0);
-function today(){
-  const d = new Date();
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-}
-const monthKey = d => d.slice(0,7);
-const fmtDate = d => { const [y,m,dd] = d.split('-'); return dd+'.'+m+'.'+y; };
-function monthKeyOffset(i){
-  const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()-i);
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-}
-function monthLabel(k){
-  const [y,m] = k.split('-');
-  return new Date(+y, +m-1, 1).toLocaleDateString('de-DE',{month:'short'});
-}
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+const ymOf = d => d.slice(0,7);
+const ymNow = () => ymOf(today());
+function addMonths(ym, n){ const [y,m] = ym.split('-').map(Number); const d = new Date(y, m-1+n, 1); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function monthName(ym){ const [y,m] = ym.split('-').map(Number); return new Date(y,m-1,1).toLocaleDateString('de-DE',{month:'long',year:'numeric'}); }
+function monthLabel(ym){ const [y,m] = ym.split('-').map(Number); return new Date(y,m-1,1).toLocaleDateString('de-DE',{month:'short'}); }
+function dayLabel(d){ const [y,m,dd] = d.split('-').map(Number); return new Date(y,m-1,dd).toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'}); }
 
 /* ---------- Berechnungen ---------- */
 const fixSum = () => sumBy(state.fixkosten, f => f.betrag);
-const sprit = () => state.km * state.verbrauch / 100 * state.spritpreis;
-const frei = () => state.gehalt - fixSum() - sprit() - state.budget;
-const quote = () => state.gehalt > 0 ? frei() / state.gehalt * 100 : 0;
-const fahrtKosten = f => f.km * state.verbrauch / 100 * state.spritpreis;
-
+const inMonth = ym => state.buchungen.filter(b => ymOf(b.datum) === ym);
+const varSum = ym => sumBy(inMonth(ym), b => b.betrag);
+const ausgabenGesamt = ym => fixSum() + varSum(ym);
+const uebrig = ym => state.gehalt - ausgabenGesamt(ym);
+function stats(list){
+  const t = list.filter(b => b.typ === 'tanken'), l = list.filter(b => b.typ === 'laden');
+  const kmT = sumBy(t, b => b.km||0), kmL = sumBy(l, b => b.km||0);
+  const liter = sumBy(t, b => b.liter||0), kwh = sumBy(l, b => b.kwh||0);
+  const euroT = sumBy(t, b => b.betrag), euroL = sumBy(l, b => b.betrag);
+  const km = kmT + kmL, euro = euroT + euroL;
+  return {km, kmT, kmL, liter, kwh, euroT, euroL, euro, count: t.length + l.length,
+    verbr: kmT > 0 && liter > 0 ? liter/kmT*100 : 0,
+    verbrKwh: kmL > 0 && kwh > 0 ? kwh/kmL*100 : 0,
+    per100: km > 0 ? euro/km*100 : 0,
+    preisL: liter > 0 ? euroT/liter : 0,
+    preisKwh: kwh > 0 ? euroL/kwh : 0};
+}
+const energyIn = ym => inMonth(ym).filter(b => b.typ === 'tanken' || b.typ === 'laden');
+function costPerKm(){
+  const all = state.buchungen.filter(b => b.typ === 'tanken' || b.typ === 'laden');
+  const k = sumBy(all, b => b.km||0);
+  return k > 0 ? sumBy(all, b => b.betrag) / k : 0;
+}
+function spritAvg(){ let s = 0; for(let i=1;i<=3;i++) s += stats(energyIn(addMonths(monat, -i))).euro; return s/3; }
+const freiPlan = () => state.gehalt - fixSum() - state.budget - spritAvg();
 function series(n){
-  const r = state.zins / 1200, s = frei();
-  let k = state.startkapital;
-  const out = [k];
-  for(let i = 0; i < n; i++){ k = k * (1 + r) + s; out.push(k); }
+  const r = state.zins/1200, s = freiPlan();
+  let k = state.startkapital; const out = [k];
+  for(let i=0;i<n;i++){ k = k*(1+r) + s; out.push(k); }
   return out;
 }
-function zielMonate(){
-  const S = series(1200);
-  const i = S.findIndex(v => v >= state.ziel);
-  return i < 0 ? null : i;
-}
+function zielMonate(){ const S = series(1200); const i = S.findIndex(v => v >= state.ziel); return i < 0 ? null : i; }
 function monatTxt(n){
   if(n === 0) return 'sofort';
-  const j = Math.floor(n/12), m = n % 12;
+  const j = Math.floor(n/12), m = n%12;
   return [j ? j+' Jahr'+(j>1?'e':'') : '', m ? m+' Monat'+(m>1?'e':'') : ''].filter(Boolean).join(' ');
 }
-function dateStr(n){
-  const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()+n);
-  return d.toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+function dateStr(n){ const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()+n); return d.toLocaleDateString('de-DE',{month:'long',year:'numeric'}); }
+function catsOf(ym){
+  const c = {};
+  if(fixSum() > 0) c.Fixkosten = fixSum();
+  inMonth(ym).filter(b => b.typ !== 'fahrt').forEach(b => {
+    const k = b.typ === 'tanken' ? 'Tanken' : b.typ === 'laden' ? 'Laden' : b.kategorie;
+    c[k] = (c[k]||0) + b.betrag;
+  });
+  return c;
+}
+
+/* ---------- Bausteine ---------- */
+let tab = 'uebersicht';
+let monat = ymNow();
+let fahrtScope = 'monat';
+
+function monthNav(){
+  return `<div class="monthnav"><button data-nav="-1" aria-label="Vormonat">‹</button><span>${monthName(monat)}</span><button data-nav="1" aria-label="Folgemonat">›</button></div>`;
+}
+function donut(cats){
+  const keys = Object.keys(cats).sort((a,b) => cats[b]-cats[a]);
+  const total = Object.values(cats).reduce((a,b) => a+b, 0);
+  if(!total) return '<p class="hint">Noch keine Ausgaben in diesem Monat.</p>';
+  const r = 42, C = 2*Math.PI*r; let off = 0;
+  const segs = keys.map(k => {
+    const len = cats[k]/total*C, col = KATS[k] || KATS.Sonstiges;
+    const s = `<circle r="${r}" cx="60" cy="60" fill="none" stroke="${col}" stroke-width="18" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 60 60)"/>`;
+    off += len; return s;
+  }).join('');
+  const legend = keys.map(k => `<div class="leg"><span class="dot" style="background:${KATS[k]||KATS.Sonstiges}"></span><span>${esc(k)}</span><b>${eur(cats[k])}</b></div>`).join('');
+  return `<div class="donutwrap"><svg class="donut" viewBox="0 0 120 120">${segs}<text class="dl" x="60" y="56" text-anchor="middle">Gesamt</text><text class="dv" x="60" y="73" text-anchor="middle">${eur(total)}</text></svg><div class="legend">${legend}</div></div>`;
+}
+function rowHtml(b){
+  if(b.typ === 'fahrt'){
+    const est = (b.km||0) * costPerKm();
+    const parts = [fmt(b.km||0,1)+' km'];
+    if(b.notiz) parts.push(esc(b.notiz));
+    return `<div class="row"><span class="dot" style="background:${KATS.Fahrt}"></span>
+      <div class="meta"><b>${esc(b.von||'Fahrt')} → ${esc(b.nach||'')}</b><small>${parts.join(' · ')}</small></div>
+      <span class="amt soft">≈ ${eur(est)}</span>
+      <button class="del" data-del="buchungen" data-id="${b.id}" aria-label="Löschen">×</button></div>`;
+  }
+  const isE = b.typ === 'tanken' || b.typ === 'laden';
+  const color = KATS[isE ? (b.typ === 'tanken' ? 'Tanken' : 'Laden') : b.kategorie] || KATS.Sonstiges;
+  const title = isE ? (b.typ === 'tanken' ? 'Tanken' : 'Laden') : esc(b.kategorie);
+  const parts = [];
+  if(b.km) parts.push(fmt(b.km,0)+' km');
+  if(b.typ === 'tanken' && b.liter) parts.push(fmt(b.liter)+' l');
+  if(b.typ === 'laden' && b.kwh) parts.push(fmt(b.kwh)+' kWh');
+  if(b.typ === 'tanken' && b.km && b.liter) parts.push(fmt(b.liter/b.km*100)+' l/100 km');
+  if(b.typ === 'laden' && b.km && b.kwh) parts.push(fmt(b.kwh/b.km*100)+' kWh/100 km');
+  if(b.notiz) parts.push(esc(b.notiz));
+  return `<div class="row"><span class="dot" style="background:${color}"></span>
+    <div class="meta"><b>${title}</b><small>${parts.join(' · ')}</small></div>
+    <span class="amt">−${eur(b.betrag)}</span>
+    <button class="del" data-del="buchungen" data-id="${b.id}" aria-label="Löschen">×</button></div>`;
+}
+function groupByDay(list){
+  const m = {};
+  list.forEach(b => (m[b.datum] = m[b.datum] || []).push(b));
+  return Object.keys(m).sort().reverse().map(d => [d, m[d]]);
+}
+const sortDesc = list => list.slice().sort((a,b) => b.datum.localeCompare(a.datum));
+function bookingForm(types){
+  const single = types.length === 1;
+  const seg = single ? `<input type="hidden" name="typ" value="${types[0]}">`
+    : `<div class="seg">${types.map((t,i) => `<label><input type="radio" name="typ" value="${t}" ${i===0?'checked':''}><span>${TYP_LABEL[t]}</span></label>`).join('')}</div>`;
+  return `<form data-form="buchung" data-typ="${types[0]}">
+    ${seg}
+    <div class="row2">
+      <label>Datum<input type="date" name="datum" value="${today()}"></label>
+      <label data-show="ausgabe tanken laden">Betrag (€)<input type="number" name="betrag" inputmode="decimal" step="0.01" placeholder=""></label>
+    </div>
+    <label data-show="ausgabe">Kategorie<select name="kategorie">${EDIT_KATS.map(k => `<option>${k}</option>`).join('')}</select></label>
+    <div class="row2">
+      <label data-show="tanken laden">Gefahrene km seit letztem Tanken/Laden<input type="number" name="km" inputmode="decimal" step="0.1"></label>
+      <label data-show="tanken">Getankt (Liter)<input type="number" name="liter" inputmode="decimal" step="0.01"></label>
+      <label data-show="laden">Geladen (kWh)<input type="number" name="kwh" inputmode="decimal" step="0.01"></label>
+    </div>
+    <div data-show="tanken"><label>Preis pro Liter (€)<input type="number" name="literpreis" inputmode="decimal" step="0.001"></label></div>
+    <div data-show="laden"><label>Preis pro kWh (€)<input type="number" name="kwhpreis" inputmode="decimal" step="0.001"></label></div>
+    <p class="hint" data-show="tanken laden">Betrag leer lassen, dann wird er aus Menge × Preis berechnet.</p>
+    <label>Notiz<input type="text" name="notiz" placeholder="optional"></label>
+    <button class="btn">Speichern</button>
+  </form>`;
+}
+function tripForm(){
+  return `<form data-form="fahrt">
+    <div class="row2">
+      <label>Von<input type="text" name="von" placeholder="z. B. Startort" required></label>
+      <label>Nach<input type="text" name="nach" placeholder="z. B. Zielort" required></label>
+    </div>
+    <div class="row2">
+      <label>Datum<input type="date" name="datum" value="${today()}"></label>
+      <label>Kilometer<input type="number" name="km" inputmode="decimal" step="0.1" required></label>
+    </div>
+    <label>Zweck / Notiz<input type="text" name="notiz" placeholder="z. B. Arbeit"></label>
+    <button class="btn">Fahrt speichern</button>
+  </form>`;
+}
+function applyTyp(form){
+  const typ = form.dataset.typ;
+  form.querySelectorAll('[data-show]').forEach(el => { el.hidden = !el.dataset.show.split(' ').includes(typ); });
 }
 
 /* ---------- Ansichten ---------- */
-function item(name, amount, list, id){
-  return `<li><span>${esc(name)}</span><span class="right">${amount}<button class="x" data-del="${list}" data-id="${id}" aria-label="Löschen">×</button></span></li>`;
+function viewUebersicht(){
+  const list = inMonth(monat);
+  const cur = varSum(monat), prev = varSum(addMonths(monat,-1));
+  let deltaHtml = '';
+  if(prev > 0){
+    const d = (cur-prev)/prev*100;
+    deltaHtml = `<span class="delta ${d > 0 ? 'neg' : 'pos'}">${d > 0 ? '▲' : '▼'} ${fmt(Math.abs(d),0)} % zum Vormonat</span>`;
+  }
+  const left = uebrig(monat);
+  const s = stats(energyIn(monat));
+  const fahrtKm = sumBy(list.filter(b => b.typ === 'fahrt'), b => b.km||0);
+  const verbrText = [s.verbr ? fmt(s.verbr)+' l/100 km' : '', s.verbrKwh ? fmt(s.verbrKwh)+' kWh/100 km' : ''].filter(Boolean).join(' · ') || '–';
+  const last = sortDesc(list).slice(0,6).map(rowHtml).join('') || '<p class="hint">Noch keine Buchungen in diesem Monat.</p>';
+  return monthNav() + `
+  <section class="card">
+    <div class="lbl">Übrig in diesem Monat</div>
+    <div class="big ${left < 0 ? 'neg' : 'pos'}">${eur(left)}</div>
+    ${deltaHtml}
+    <div class="split"><span>Gehalt</span><b>${eur(state.gehalt)}</b></div>
+    <div class="split"><span>Fixkosten</span><b>${eur(fixSum())}</b></div>
+    <div class="split"><span>Variable Ausgaben</span><b>${eur(cur)}</b></div>
+  </section>
+
+  <div class="sec">Verteilung</div>
+  <section class="card">${donut(catsOf(monat))}</section>
+
+  <div class="sec">Fahrzeug · ${ANTRIEB[state.antrieb]}</div>
+  <div class="kpis">
+    <div class="kpi"><small>Gefahren (Tanken/Laden)</small><b>${fmt(s.km,0)} km</b></div>
+    <div class="kpi"><small>Energiekosten</small><b>${eur(s.euro)}</b></div>
+    <div class="kpi"><small>Kosten pro 100 km</small><b>${s.km ? eur(s.per100) : '–'}</b></div>
+    <div class="kpi"><small>Verbrauch</small><b style="font-size:15px">${verbrText}</b></div>
+    <div class="kpi"><small>Eingetragene Fahrten</small><b>${fmt(fahrtKm,0)} km</b></div>
+    <div class="kpi"><small>Geschätzt pro km</small><b>${costPerKm() ? eur(costPerKm()) : '–'}</b></div>
+  </div>
+
+  <div class="sec">Letzte Buchungen</div>
+  <section class="card">${last}</section>`;
+}
+
+function viewBuchungen(){
+  const list = sortDesc(inMonth(monat));
+  const groups = groupByDay(list).map(([d, items]) => `<div class="day">${dayLabel(d)}</div>${items.map(rowHtml).join('')}`).join('');
+  return monthNav() + `
+  <div class="sec">Neue Buchung</div>
+  <section class="card">${bookingForm(availTypes())}</section>
+  <div class="sec">Alle Buchungen</div>
+  <section class="card">${groups || '<p class="hint">Keine Buchungen in diesem Monat.</p>'}</section>`;
+}
+
+function viewFahrzeug(){
+  const list = inMonth(monat);
+  const s = stats(list.filter(b => b.typ === 'tanken' || b.typ === 'laden'));
+  const keys = [5,4,3,2,1,0].map(i => addMonths(monat, -i));
+  const vals = keys.map(k => stats(energyIn(k)).euro);
+  const vmax = Math.max(1, ...vals);
+  const bars = keys.map((k,i) => `<div><div class="bar"><b style="height:${(vals[i]/vmax*100).toFixed(1)}%"></b></div><span>${monthLabel(k)}</span></div>`).join('');
+  const tiles = [];
+  if(canTank()){
+    tiles.push(`<div class="stat"><small>Getankt</small><b>${fmt(s.liter)} l</b></div>`);
+    tiles.push(`<div class="stat"><small>Ø Preis pro Liter</small><b>${s.preisL ? fmt(s.preisL,2)+' €' : '–'}</b></div>`);
+    tiles.push(`<div class="stat"><small>Verbrauch</small><b>${s.verbr ? fmt(s.verbr)+' l/100 km' : '–'}</b></div>`);
+  }
+  if(canLade()){
+    tiles.push(`<div class="stat"><small>Geladen</small><b>${fmt(s.kwh)} kWh</b></div>`);
+    tiles.push(`<div class="stat"><small>Ø Preis pro kWh</small><b>${s.preisKwh ? fmt(s.preisKwh,2)+' €' : '–'}</b></div>`);
+    tiles.push(`<div class="stat"><small>Verbrauch</small><b>${s.verbrKwh ? fmt(s.verbrKwh)+' kWh/100 km' : '–'}</b></div>`);
+  }
+  const entries = sortDesc(list.filter(b => b.typ === 'tanken' || b.typ === 'laden')).map(rowHtml).join('') || '<p class="hint">Keine Tankungen oder Ladungen in diesem Monat.</p>';
+  return monthNav() + `
+  <div class="kpis">
+    <div class="kpi"><small>Gefahren</small><b>${fmt(s.km,0)} km</b></div>
+    <div class="kpi"><small>Kosten</small><b>${eur(s.euro)}</b></div>
+    <div class="kpi"><small>Pro 100 km</small><b>${s.km ? eur(s.per100) : '–'}</b></div>
+    <div class="kpi"><small>Vorgänge</small><b>${s.count}</b></div>
+  </div>
+  <section class="card"><h2>Details ${monthName(monat)}</h2><div class="grid2">${tiles.join('')}</div></section>
+  <section class="card"><h2>Energiekosten, letzte 6 Monate</h2><div class="cols">${bars}</div></section>
+  <div class="sec">Neu erfassen</div>
+  <section class="card">${bookingForm(energyTypes())}</section>
+  <div class="sec">Einträge</div>
+  <section class="card">${entries}</section>`;
+}
+
+function viewFahrten(){
+  const fahrten = state.buchungen.filter(b => b.typ === 'fahrt');
+  const scoped = sortDesc(fahrtScope === 'alle' ? fahrten : fahrten.filter(b => ymOf(b.datum) === monat));
+  const km = sumBy(scoped, b => b.km||0);
+  const cost = km * costPerKm();
+  const list = scoped.map(rowHtml).join('') || '<p class="hint">Noch keine Fahrten in dieser Auswahl.</p>';
+  return `
+  <div class="pills">
+    <button class="pill ${fahrtScope==='monat'?'on':''}" data-scope="monat">Dieser Monat</button>
+    <button class="pill ${fahrtScope==='alle'?'on':''}" data-scope="alle">Alle Fahrten</button>
+  </div>
+  ${fahrtScope === 'monat' ? monthNav() : ''}
+  <div class="kpis">
+    <div class="kpi"><small>Fahrten</small><b>${scoped.length}</b></div>
+    <div class="kpi"><small>Strecke</small><b>${fmt(km,0)} km</b></div>
+    <div class="kpi" style="grid-column:span 2"><small>Geschätzte Kosten</small><b>${eur(cost)}</b><em>Basis: Ø Energiekosten pro km aus deinen Tankungen und Ladungen</em></div>
+  </div>
+  <div class="sec">Neue Fahrt</div>
+  <section class="card">${tripForm()}</section>
+  <div class="sec">Fahrten</div>
+  <section class="card">${list}</section>`;
+}
+
+function lineChart(S){
+  const W = 320, H = 150, P = 6;
+  const min = Math.min(...S), max = Math.max(...S), span = (max-min) || 1;
+  const pts = S.map((v,i) => {
+    const x = P + i/(S.length-1)*(W-2*P);
+    const y = H - P - (v-min)/span*(H-2*P);
+    return x.toFixed(1)+','+y.toFixed(1);
+  }).join(' ');
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Kontoverlauf"><polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/></svg>
+  <div class="axis"><span>heute ${eur(S[0])}</span><span>+36 Monate ${eur(S[S.length-1])}</span></div>`;
 }
 
 function viewPlan(){
   const S = series(60);
-  const f = frei();
-  const zi = zielMonate();
+  const zi = state.ziel > 0 ? zielMonate() : undefined;
   let zielHtml;
-  if(state.ziel <= 0) zielHtml = '<p class="hint">Trag einen Ziel-Betrag ein, dann siehst du, wann du ihn erreichst.</p>';
-  else if(zi === null) zielHtml = '<p class="neg" style="margin:8px 0 0">Mit dieser Sparrate erreichst du das Ziel nicht.</p>';
-  else zielHtml = `<p style="margin:8px 0 0">„${esc(state.zielName)}“ erreicht in <b>${monatTxt(zi)}</b> (${dateStr(zi)}).</p>`;
-
-  const rows = [3,6,12,24,36,60].map(m =>
-    `<tr><td>in ${m} Monaten<span class="muted"> · ${dateStr(m)}</span></td><td>${eur(S[m])}</td></tr>`).join('');
-
+  if(state.ziel <= 0) zielHtml = '<p class="hint">Gib einen Ziel-Betrag ein, dann siehst du, wann du ihn erreichst.</p>';
+  else if(zi === null) zielHtml = '<p class="neg" style="margin:10px 0 0">Mit dieser Sparrate erreichst du das Ziel nicht.</p>';
+  else zielHtml = `<p style="margin:10px 0 0">„${esc(state.zielName)}“ erreicht in <b>${monatTxt(zi)}</b> (${dateStr(zi)}).</p>`;
+  const rows = [3,6,12,24,36,60].map(m => `<tr><td>in ${m} Monaten</td><td>${eur(S[m])}</td></tr>`).join('');
+  const fixList = state.fixkosten.map(x => `<li><span>${esc(x.name)}</span><span style="display:flex;gap:6px;align-items:center">${eur(x.betrag)}<button class="del" data-del="fixkosten" data-id="${x.id}" aria-label="Löschen">×</button></span></li>`).join('') || '<li class="hint">Noch keine Fixkosten.</li>';
+  const opts = Object.keys(ANTRIEB).map(k => `<option value="${k}" ${state.antrieb===k?'selected':''}>${ANTRIEB[k]}</option>`).join('');
   return `
+  <div class="sec">Fahrzeug und Einkommen</div>
   <section class="card">
-    <label><span class="lbl">Nettogehalt pro Monat (€)</span>
-      <input type="number" inputmode="decimal" step="10" data-f="gehalt" value="${state.gehalt}"></label>
+    <label>Antrieb<select data-f="antrieb">${opts}</select></label>
+    <label>Gehalt pro Monat (€)<input type="number" inputmode="decimal" step="10" data-f="gehalt" value="${state.gehalt}"></label>
+    <label>Sonstige Ausgaben als Budget (€)<input type="number" inputmode="decimal" step="10" data-f="budget" value="${state.budget}"></label>
+    <div class="split"><span>Energiekosten (Ø letzte 3 Monate)</span><b>${eur(spritAvg())}</b></div>
   </section>
 
+  <div class="sec">Fixkosten</div>
   <section class="card">
-    <h2>Fixkosten</h2>
     <form data-form="fix" class="addrow">
       <input name="name" type="text" placeholder="z. B. Miete" required>
       <input name="betrag" type="number" inputmode="decimal" step="0.01" placeholder="€" required>
       <button class="btn">+</button>
     </form>
-    <ul class="list">${state.fixkosten.map(x => item(x.name, eur(x.betrag), 'fixkosten', x.id)).join('') || '<li class="muted">Noch keine Fixkosten.</li>'}</ul>
-    <div class="sum"><span>Summe Fixkosten</span><span>${eur(fixSum())}</span></div>
+    <ul class="list">${fixList}</ul>
+    <div class="split"><span>Summe Fixkosten</span><b>${eur(fixSum())}</b></div>
   </section>
 
+  <div class="sec">Frei zum Sparen</div>
   <section class="card">
-    <h2>Monatlich</h2>
-    <label><span class="lbl">Sonstige Ausgaben als Budget (€)</span>
-      <input type="number" inputmode="decimal" step="10" data-f="budget" value="${state.budget}"></label>
-    <label><span class="lbl">Gefahrene km pro Monat</span>
-      <input type="number" inputmode="decimal" step="10" data-f="km" value="${state.km}"></label>
-    <div class="calc"><span class="muted" style="font-weight:400">Sprit pro Monat</span><span>${eur(sprit())}</span></div>
-    <p class="hint">Basis: ${state.verbrauch.toLocaleString('de-DE')} l/100 km, ${state.spritpreis.toLocaleString('de-DE')} €/l (änderbar im Tab Fahrten).</p>
+    <div class="lbl">Pro Monat</div>
+    <div class="big ${freiPlan() < 0 ? 'neg' : 'pos'}">${eur(freiPlan())}</div>
+    <p class="hint">Gehalt minus Fixkosten, Budget und Energiekosten.</p>
   </section>
 
-  <section class="card hero">
-    <span class="lbl">Frei zum Sparen pro Monat</span>
-    <div class="big ${f < 0 ? 'neg' : 'pos'}">${eur(f)}</div>
-    <p class="hint" style="margin:0">Sparquote: ${quote().toLocaleString('de-DE',{maximumFractionDigits:1})} % vom Gehalt</p>
-  </section>
-
+  <div class="sec">Sparziel und Prognose</div>
   <section class="card">
-    <h2>Sparziel und Prognose</h2>
     <div class="row2">
-      <label><span class="lbl">Vorhandenes Geld (€)</span>
-        <input type="number" inputmode="decimal" step="10" data-f="startkapital" value="${state.startkapital}"></label>
-      <label><span class="lbl">Zins pro Jahr (%)</span>
-        <input type="number" inputmode="decimal" step="0.1" data-f="zins" value="${state.zins}"></label>
-      <label><span class="lbl">Name des Ziels</span>
-        <input type="text" data-f="zielName" data-type="text" value="${esc(state.zielName)}"></label>
-      <label><span class="lbl">Ziel-Betrag (€)</span>
-        <input type="number" inputmode="decimal" step="100" data-f="ziel" value="${state.ziel}"></label>
+      <label>Vorhandenes Geld (€)<input type="number" inputmode="decimal" step="10" data-f="startkapital" value="${state.startkapital}"></label>
+      <label>Zins pro Jahr (%)<input type="number" inputmode="decimal" step="0.1" data-f="zins" value="${state.zins}"></label>
+      <label>Name des Ziels<input type="text" data-f="zielName" data-type="text" value="${esc(state.zielName)}"></label>
+      <label>Ziel-Betrag (€)<input type="number" inputmode="decimal" step="100" data-f="ziel" value="${state.ziel}"></label>
     </div>
     ${zielHtml}
-    <table style="margin-top:12px">${rows}</table>
+    <div style="margin-top:14px">${lineChart(series(36))}</div>
+    <table style="margin-top:14px">${rows}</table>
   </section>`;
 }
 
-function viewAusgaben(){
-  const mk = monthKey(today());
-  const used = sumBy(state.ausgaben.filter(a => monthKey(a.datum) === mk), a => a.betrag);
-  const left = state.budget - used;
-  const sorted = [...state.ausgaben].sort((a,b) => b.datum.localeCompare(a.datum));
-  return `
-  <div class="kpis">
-    <div class="kpi">Diesen Monat ausgegeben<b>${eur(used)}</b></div>
-    <div class="kpi">Budget übrig<b class="${left < 0 ? 'neg' : 'pos'}">${eur(left)}</b></div>
-  </div>
-
-  <section class="card">
-    <h2>Ausgabe erfassen</h2>
-    <form data-form="ausgabe">
-      <div class="row2">
-        <label><span class="lbl">Datum</span><input type="date" name="datum" value="${today()}"></label>
-        <label><span class="lbl">Betrag (€)</span><input type="number" name="betrag" inputmode="decimal" step="0.01" required></label>
-      </div>
-      <label><span class="lbl">Kategorie</span>
-        <select name="kategorie">${KAT.map(k => `<option>${k}</option>`).join('')}</select></label>
-      <label><span class="lbl">Notiz</span><input type="text" name="notiz" placeholder="optional"></label>
-      <button class="btn full">Hinzufügen</button>
-    </form>
-  </section>
-
-  <section class="card">
-    <h2>Verlauf</h2>
-    <ul class="list">${sorted.map(a => `<li><span>${fmtDate(a.datum)} · ${esc(a.kategorie)}${a.notiz ? '<br><span class="muted">'+esc(a.notiz)+'</span>' : ''}</span><span class="right">${eur(a.betrag)}<button class="x" data-del="ausgaben" data-id="${a.id}" aria-label="Löschen">×</button></span></li>`).join('') || '<li class="muted">Noch keine Ausgaben erfasst.</li>'}</ul>
-  </section>`;
-}
-
-function viewFahrten(){
-  const sorted = [...state.fahrten].sort((a,b) => b.datum.localeCompare(a.datum));
-  const totalKm = sumBy(state.fahrten, f => f.km);
-  const totalCost = sumBy(state.fahrten, fahrtKosten);
-  const monate = new Set(state.fahrten.map(f => monthKey(f.datum))).size;
-  const avg = monate ? totalKm / monate : 0;
-  return `
-  <section class="card">
-    <h2>Spritkosten</h2>
-    <div class="row2">
-      <label><span class="lbl">Verbrauch (l/100 km)</span>
-        <input type="number" inputmode="decimal" step="0.1" data-f="verbrauch" value="${state.verbrauch}"></label>
-      <label><span class="lbl">Spritpreis (€/l)</span>
-        <input type="number" inputmode="decimal" step="0.01" data-f="spritpreis" value="${state.spritpreis}"></label>
-    </div>
-    <label><span class="lbl">Strecke rechnen (km)</span>
-      <input type="number" inputmode="decimal" step="0.1" id="rechKm" placeholder="z. B. 42"></label>
-    <div class="calc"><span class="muted" style="font-weight:400">Kosten</span><span id="rechOut">${eur(0)}</span></div>
-  </section>
-
-  <div class="kpis">
-    <div class="kpi">Kilometer gesamt<b>${totalKm.toLocaleString('de-DE',{maximumFractionDigits:1})} km</b></div>
-    <div class="kpi">Sprit gesamt<b>${eur(totalCost)}</b></div>
-  </div>
-
-  <section class="card">
-    <h2>Fahrt eintragen</h2>
-    <form data-form="fahrt">
-      <div class="row2">
-        <label><span class="lbl">Datum</span><input type="date" name="datum" value="${today()}"></label>
-        <label><span class="lbl">Kilometer</span><input type="number" name="km" inputmode="decimal" step="0.1" required></label>
-      </div>
-      <label><span class="lbl">Zweck</span><input type="text" name="zweck" placeholder="z. B. Arbeit"></label>
-      <button class="btn full">Speichern</button>
-    </form>
-    <p class="hint">Durchschnitt: ${avg.toLocaleString('de-DE',{maximumFractionDigits:0})} km pro Monat aus deinem Fahrtenbuch.</p>
-  </section>
-
-  <section class="card">
-    <h2>Fahrtenbuch</h2>
-    <ul class="list">${sorted.map(f => `<li><span>${fmtDate(f.datum)} · ${esc(f.zweck || 'Fahrt')}<br><span class="muted">${f.km.toLocaleString('de-DE',{maximumFractionDigits:1})} km · ${eur(fahrtKosten(f))}</span></span><button class="x" data-del="fahrten" data-id="${f.id}" aria-label="Löschen">×</button></li>`).join('') || '<li class="muted">Noch keine Fahrten.</li>'}</ul>
-  </section>`;
-}
-
-function viewAnalyse(){
-  const mk = monthKey(today());
-  const ausMonth = sumBy(state.ausgaben.filter(a => monthKey(a.datum) === mk), a => a.betrag);
-  const ausAll = sumBy(state.ausgaben, a => a.betrag);
-  const trips = sumBy(state.fahrten, fahrtKosten);
-
-  const S = series(36);
-  const min = Math.min(...S), max = Math.max(...S), span = (max - min) || 1;
-  const W = 320, H = 150, P = 6;
-  const pts = S.map((v,i) => {
-    const x = P + i / (S.length - 1) * (W - 2*P);
-    const y = H - P - (v - min) / span * (H - 2*P);
-    return x.toFixed(1)+','+y.toFixed(1);
-  }).join(' ');
-  const chart = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Kontoverlauf über 36 Monate">
-    <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-  </svg>
-  <div class="axis"><span>heute ${eur(S[0])}</span><span>+36 Monate ${eur(S[S.length-1])}</span></div>`;
-
-  const cats = KAT.map(k => [k, sumBy(state.ausgaben.filter(a => a.kategorie === k), a => a.betrag)]);
-  const cmax = Math.max(1, ...cats.map(c => c[1]));
-  const catHtml = cats.map(([k,v]) =>
-    `<div class="hbar"><span>${k}</span><div class="track"><i style="width:${(v/cmax*100).toFixed(1)}%"></i></div><b>${eur(v)}</b></div>`).join('');
-
-  const keys = [5,4,3,2,1,0].map(monthKeyOffset);
-  const vals = keys.map(k => sumBy(state.ausgaben.filter(a => monthKey(a.datum) === k), a => a.betrag)
-                         + sumBy(state.fahrten.filter(f => monthKey(f.datum) === k), fahrtKosten));
-  const vmax = Math.max(1, ...vals);
-  const monHtml = keys.map((k,i) =>
-    `<div class="col"><div class="bar"><i style="height:${(vals[i]/vmax*100).toFixed(1)}%"></i></div><span>${monthLabel(k)}</span></div>`).join('');
-
-  const sparquote = quote().toLocaleString('de-DE',{maximumFractionDigits:1}) + ' %';
-  return `
-  <div class="kpis">
-    <div class="kpi">Sparen pro Monat<b class="${frei() < 0 ? 'neg' : 'pos'}">${eur(frei())}</b></div>
-    <div class="kpi">Sparquote<b>${sparquote}</b></div>
-    <div class="kpi">Ausgaben diesen Monat<b>${eur(ausMonth)}</b></div>
-    <div class="kpi">Ausgaben gesamt<b>${eur(ausAll + trips)}</b></div>
-  </div>
-
-  <section class="card">
-    <h2>Kontoverlauf</h2>
-    ${chart}
-    <p class="hint">Mit Zinsen von ${state.zins.toLocaleString('de-DE')} % pro Jahr und einer Sparrate von ${eur(frei())} pro Monat.</p>
-  </section>
-
-  <section class="card">
-    <h2>Ausgaben nach Kategorie</h2>
-    ${catHtml}
-  </section>
-
-  <section class="card">
-    <h2>Letzte 6 Monate (inkl. Sprit)</h2>
-    <div class="cols">${monHtml}</div>
-  </section>`;
-}
-
-/* ---------- Steuerung ---------- */
-let tab = 'plan';
-const VIEWS = {plan: viewPlan, ausgaben: viewAusgaben, fahrten: viewFahrten, analyse: viewAnalyse};
-
+const VIEWS = {uebersicht: viewUebersicht, buchungen: viewBuchungen, fahrzeug: viewFahrzeug, fahrten: viewFahrten, plan: viewPlan};
 function render(){
   $('#app').innerHTML = VIEWS[tab]();
   document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
-  $('#monat').textContent = new Date().toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+  $('#antriebChip').textContent = ANTRIEB[state.antrieb];
+  document.querySelectorAll('form[data-form="buchung"]').forEach(applyTyp);
 }
 function commit(){ save(); render(); }
 
+/* ---------- Ereignisse ---------- */
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-tab]');
   if(t){ tab = t.dataset.tab; render(); window.scrollTo(0,0); return; }
+  const s = e.target.closest('[data-scope]');
+  if(s){ fahrtScope = s.dataset.scope; render(); return; }
+  const n = e.target.closest('[data-nav]');
+  if(n){ monat = addMonths(monat, +n.dataset.nav); render(); return; }
   const d = e.target.closest('[data-del]');
   if(d){
     const list = d.dataset.del;
@@ -352,16 +497,11 @@ document.addEventListener('click', e => {
 
 document.addEventListener('change', e => {
   const t = e.target;
+  if(t.name === 'typ' && t.form){ t.form.dataset.typ = t.value; applyTyp(t.form); return; }
   if(!t.dataset || !t.dataset.f) return;
-  state[t.dataset.f] = t.dataset.type === 'text' ? t.value : num(t.value);
+  const k = t.dataset.f;
+  state[k] = (t.tagName === 'SELECT' || t.dataset.type === 'text') ? t.value : num(t.value);
   commit();
-});
-
-document.addEventListener('input', e => {
-  if(e.target.id === 'rechKm'){
-    const o = $('#rechOut');
-    if(o) o.textContent = eur(num(e.target.value) * state.verbrauch / 100 * state.spritpreis);
-  }
 });
 
 document.addEventListener('submit', e => {
@@ -369,17 +509,36 @@ document.addEventListener('submit', e => {
   const f = e.target, d = new FormData(f), k = f.dataset.form;
   if(k === 'fix'){
     state.fixkosten.push({id:uid(), name:String(d.get('name')).trim() || 'Fixkosten', betrag:num(d.get('betrag'))});
-  }
-  if(k === 'ausgabe'){
-    state.ausgaben.push({id:uid(), datum:d.get('datum') || today(), kategorie:String(d.get('kategorie')),
-                         betrag:num(d.get('betrag')), notiz:String(d.get('notiz') || '').trim()});
+    commit(); return;
   }
   if(k === 'fahrt'){
-    state.fahrten.push({id:uid(), datum:d.get('datum') || today(), km:num(d.get('km')),
-                        zweck:String(d.get('zweck') || '').trim()});
+    const datum = String(d.get('datum') || today());
+    state.buchungen.push({id:uid(), typ:'fahrt', datum, betrag:0, kategorie:'Fahrt',
+      von:String(d.get('von')||'').trim(), nach:String(d.get('nach')||'').trim(),
+      km:num(d.get('km')), notiz:String(d.get('notiz')||'').trim()});
+    monat = ymOf(datum);
+    commit(); return;
   }
+  if(k !== 'buchung') return;
+  const typ = String(d.get('typ') || 'ausgabe');
+  const datum = String(d.get('datum') || today());
+  const b = {id:uid(), typ, datum, betrag:num(d.get('betrag')), notiz:String(d.get('notiz') || '').trim()};
+  if(typ === 'tanken'){
+    b.kategorie = 'Tanken'; b.km = num(d.get('km')); b.liter = num(d.get('liter'));
+    const lp = num(d.get('literpreis'));
+    if(!b.betrag && b.liter && lp) b.betrag = b.liter * lp;
+  } else if(typ === 'laden'){
+    b.kategorie = 'Laden'; b.km = num(d.get('km')); b.kwh = num(d.get('kwh'));
+    const kp = num(d.get('kwhpreis'));
+    if(!b.betrag && b.kwh && kp) b.betrag = b.kwh * kp;
+  } else {
+    b.kategorie = String(d.get('kategorie') || 'Sonstiges');
+  }
+  state.buchungen.push(b);
+  monat = ymOf(datum);
   commit();
 });
 
+load();
 render();
 </script>
